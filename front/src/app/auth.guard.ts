@@ -13,7 +13,8 @@ export class AuthGuard implements CanActivate {
     state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
     // Comprobar si el token está en el local storage
     const token = localStorage.getItem('token');
-    if (!token) {
+    const user = JSON.parse(localStorage.getItem('user') ?? '');
+    if (!token || user.status != true ) {
       // Si no hay token, redirigir a la página de inicio de sesión
       this.router.navigate(['/login']);
       return false;
