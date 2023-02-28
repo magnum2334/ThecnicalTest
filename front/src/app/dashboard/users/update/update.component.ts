@@ -7,7 +7,7 @@ export interface User {
   id:number;
   name: string;
   email: string;
-  role: string;
+  id_rol: string;
 }
 @Component({
   selector: 'app-update',
@@ -28,7 +28,7 @@ export class UpdateComponent {
     id_rol: new FormControl('', [Validators.required]),
   });
   ngOnInit() {
-
+    console.log(this.data)
     this.updateForm.patchValue(this.data)
     this.api.roles().subscribe((res: any) => {
       if (res) {

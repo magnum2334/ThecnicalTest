@@ -39,6 +39,7 @@ export class UpdateRolComponent {
     })
   }
   async ngOnInit() {
+
     this.updateForm.patchValue(this.data)
     this.permissions =this.data.permissions
     this.updateForm.patchValue({

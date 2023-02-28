@@ -3,26 +3,37 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
+
 use App\Models\User;
-use App\Models\Error;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class AuthController extends Controller
 {
 
-    // authentication functions
+    /**
+     * Attempts to log in a user with the given email and password.
+     *
+     * @param  Request  $request  The HTTP request.
+     * @return Response           The HTTP response with the authentication token and user details on success, or an error message on failure.
+     */
     public function login(Request $request)
     {
+        // validator data
+
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
+
+        // Get the email and password fields from the request
         $credentials = $request->only('email', 'password');
+
+        // Attempt to authenticate the user using the input credentials
         $token = Auth::attempt($credentials);
+
+        // If authentication is unsuccessful, return an error response with a 401 status code
         if (!$token) {
             return response()->json([
                 'status' => 'error',
@@ -30,32 +41,44 @@ class AuthController extends Controller
             ], 401);
         }
 
+        // Retrieve the user data using the authenticated email
         $user = User::where('email', $credentials['email'])->first();
+
+        // Retrieve the authenticated user
         $userAut = Auth::user();
+
+        // Return a success response with the token and user data
         return response()->json(compact('token', 'user'), 200);
     }
 
 
+    /**
+     * Registers a new user with the given name, email, password, and role.
+     *
+     * @param  Request  $request  The HTTP request.
+     * @return Response           The HTTP response with the new user details and authentication token on success, or an error message on failure.
+     */
     public function register(Request $request)
     {
+        //validate data user
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
         ]);
-        if ($request->email == 'admin@admin.com') {
-            $rol = 1;
-        } else {
-            $rol = $request->rol;
-        }
+
+        // Create a new user with the name, email, password, and role fields
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'id_rol' => $rol
+            'id_rol' =>  $request->rol
         ]);
 
+        // Authenticate the newly created user and get the authentication token
         $token = Auth::login($user);
+
+        // Return a success response with the token, user data, and bearer authorization type
         return response()->json([
             'status' => 'success',
             'message' => 'User created successfully',
@@ -64,10 +87,17 @@ class AuthController extends Controller
                 'token' => $token,
                 'type' => 'bearer',
             ]
-        ]);
+        ], 201);
     }
+
+    /**
+     * Logs out the currently authenticated user.
+     *
+     * @return Response  The HTTP response with a success message.
+     */
     public function logout()
     {
+        // Return a success response logged out
         Auth::logout();
         return response()->json([
             'status' => 'success',
@@ -75,6 +105,11 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Refreshes the authentication token for the currently authenticated user.
+     *
+     * @return Response  The HTTP response with the new authentication token and user details.
+     */
     public function refresh()
     {
         return response()->json([
@@ -86,167 +121,13 @@ class AuthController extends Controller
             ]
         ]);
     }
+    /**
+     * Gets the details of the currently authenticated user.
+     *
+     * @return Response  The HTTP response
+     */
     public function me()
     {
         return response()->json(auth()->user());
     }
-    # users functions
-    public function users(Request $request)
-    {
-        $users = DB::table('users')
-            ->where('email', '!=', 'admin@admin.com')
-            ->get();
-        return response()->json(compact('users'), 200);
-    }
-
-    public function updateUser(Request $request, $id)
-    {
-
-        try {
-            $user = User::find($id);
-            $user->update($request->all());
-            $mess = 'User update successfully';
-            return response()->json(compact('mess'), 200);
-        } catch (\Throwable $th) {
-            $mess = 'User update error';
-            return response()->json(compact('mess'), 200);
-        }
-    }
-    public function userstatus(Request $request, $id)
-    {
-
-        $user = User::find($id);
-
-        if (!$user) {
-            return response()->json(['message' => 'Usuario no encontrado.'], 404);
-        }
-
-        if ($user->status == false) {
-            $user->status = true;
-            $user->update();
-            return response()->json(['message' => 'El usuario ya está activo.'], 200);
-        }
-        if ($user->status == true) {
-            $user->status = false;
-            $user->update();
-            return response()->json(['message' => 'El usuario ya está inactivo.'], 200);
-        }
-    }
-    # users roles and permission functions
-    public function createRol(Request $request)
-    {
-        try {
-            $role = Role::create(['name' => $request->name]);
-            $role->syncPermissions($request->permissions);
-
-            return response()->json(['message' => 'role created!'], 200);
-        } catch (\Throwable $th) {
-            return response()->json(['message' => 'role Error create!'], 400);
-        }
-    }
-    public function updateRol(Request $request)
-    {
-        try {
-            $role = Role::find($request->id);
-            $role->update($request->all());
-            $role->syncPermissions($request->permissions);
-            $message = 'Role update successfully';
-            return response()->json(compact('message'), 200);
-        } catch (\Throwable $th) {
-            $message = 'Role update error'.$th;
-            return response()->json(compact('message'), 400);
-        }
-    }
-
-    public function createPermission(Request $request)
-    {
-        try {
-            $permission = Permission::create(['name' => $request->name]);
-            return response()->json(['message' => 'Permission create!'], 200);
-        } catch (\Throwable $th) {
-            return response()->json(['message' => 'Permission Error create!'], 400);
-        }
-    }
-
-    public function permissions(Request $request)
-    {
-        $permissions = Permission::all();
-        return response()->json(['permission' => $permissions], 200);
-    }
-    public function roles(Request $request)
-    {
-        $roles = Role::with('permissions')->get();
-        return response()->json(['roles' => $roles], 200);
-    }
-
-    public function updatePermission(Request $request)
-    {
-        try {
-            $permission = Permission::find($request->id);
-            $permission->update($request->all());
-            $message = 'Permission update successfully';
-            return response()->json(compact('message'), 200);
-        } catch (\Throwable $th) {
-            $message = 'Permission update error';
-            return response()->json(compact('message'), 400);
-        }
-    }
-    # Error software functions
-    public function createError(Request $request)
-    {
-        try {
-            $file = $request->file('file_path');
-            if (isset($file)) {
-                $file_path = $file->store('pdf', 'public');
-                if($file_path){
-                    $error = new Error;
-                    $error->title = $request->title;
-                    $error->description = $request->description;
-                    $error->importance_level = $request->importance_level;
-                    $error->file_path =$file_path;
-                    $error->save();
-                }
-                return response()->json(['message' => ' create Error software successfully !!'], 200);
-            } else {
-                return response()->json(['message' => '  Error file is null !!'], 400);
-            }
-
-
-         } catch (\Throwable $th) {
-            // Handle any exceptions that occurred
-            return response()->json(['message' => 'Error consult'.$th], 500);
-         }
-    }
-
-    public function errors(Request $request)
-    {
-        $errors = Error::all();
-        return response()->json(['errors' => $errors], 200);
-    }
-    public function updateError(Request $request)
-    {
-        try {
-
-            $permission = Error::find($request->id);
-            $permission->update($request->all());
-            $message = 'Error software update successfully';
-            return response()->json(compact('message'), 200);
-        } catch (\Throwable $th) {
-            $message = 'Error update error';
-            return response()->json(compact('message'), 400);
-        }
-    }
-    public function userPermissions(Request $request)
-    {
-        $roles = Role::findById($request->id);
-        $permissions = $roles->permissions;
-
-        return response()->json(['permissions' => $permissions], 200);
-    }
-    public function pdf(Request $request){
-        $file = storage_path('app/' . $request->name);
-        return response()->file($file);
-    }
-
-
 }
