@@ -1,0 +1,40 @@
+<div class="container">
+  <div class="row">
+    <div class="col m-4">
+      <div class="card ">
+        <div class="card-header text-center fs-2">
+          create
+        </div>
+        <div class="card-body  p-2">
+          <form [formGroup]="errorForm" (ngSubmit)="onSubmit()" class="container">
+            <div class="form-group">
+              <label for="errorTitle">Error Title</label>
+              <input type="text" class="form-control" formControlName="title" id="title" placeholder="Enter error title">
+            </div>
+            <div class="form-group">
+              <label for="errorDescription">Error Description</label>
+              <textarea class="form-control" formControlName="description" id="description" placeholder="Enter error description"></textarea>
+            </div>
+          
+            <div class="form-group">
+              <label for="importanceLevel">Importance Level</label>
+              <select class="form-control" formControlName="importance_level" id="importanceLevel">
+                <option *ngFor="let level of importanceLevels" [value]="level">{{ level }}</option>
+              </select>
+            </div>
+          
+            <div class="form-group">
+              <label for="pdfAttachment">PDF Attachment</label>
+              <div class="custom-file">
+                <input type="file" class="custom-file-input" formControlName="file"  id="file" (change)="onFileSelected($event)">
+                <label class="custom-file-label" for="pdfAttachment">Choose file</label>
+              </div>
+            </div>
+          
+            <button type="submit" [disabled]="errorForm.invalid" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

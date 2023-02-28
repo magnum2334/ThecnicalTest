@@ -1,0 +1,58 @@
+<div class="container">
+  <div class="row my-5">
+    <div class="col">
+      <button (click)="createRol()" class="btn btn-primary mx-2"> add Rol</button>
+      <button (click)="createPermission()" class="btn btn-primary"> add permission</button>
+    </div>
+  </div>
+
+  <div class="text-center"> <h2 > Table Permission</h2 ><br></div>
+  <div class="row">
+    <table class="table">
+      <thead>
+        <tr >
+          <th>id</th>
+          <th>name</th>
+          <th>actions</th>
+        </tr>
+      </thead>
+      <tbody>
+       <tr *ngFor="let permission of permissions">
+        <td>{{permission.id}}</td>
+        <td>{{permission.name}}</td>
+        <td>
+          <button (click)="edit(permission)" class="btn btn-sm btn-primary mx-2">Edit</button>
+        </td>
+       </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="text-center"><h2> Table Rol</h2 ><br></div>
+  <div class="row">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>name </th>
+          <th>permissions </th>
+          <th>actions </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let role of roles">
+          <td>{{role.id}}</td>
+          <td>{{role.name}}</td>
+          <td>
+            <ul>
+                <li *ngFor="let permission of role.permissions">{{ permission.name }}</li>
+            </ul>
+          </td>
+          <td>
+            <button  (click)="rolEdit(role)" class="btn btn-sm btn-primary mx-2">Edit</button>
+          </td>
+         </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

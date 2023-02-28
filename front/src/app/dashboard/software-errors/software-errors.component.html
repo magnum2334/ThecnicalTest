@@ -1,0 +1,35 @@
+<div class="container">
+  <div class="row my-5">
+    <div class="col">
+      <button (click)="createError()" class="btn btn-primary mx-2"> Add software error</button>
+      <button (click)="excel()" class="btn btn-success "> Excel</button>
+    </div>
+  </div>
+
+  <div class="text-center"> <h2 > Table Error</h2 ><br></div>
+  <div class="row">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>title </th>
+          <th>description </th>
+          <th>importance_level </th>
+          <th>actions </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let error of errors">
+          <td>{{error.id}}</td>
+          <td>{{error.title}}</td>
+          <td>{{error.description}}</td>
+          <td>{{error.importance_level}}</td>
+          <td>
+            <button (click)="pdf(error.file_path)"  class="btn btn-sm btn-danger mx-2 ">pdf</button>
+            <button (click)="update(error)"  *ngxPermissionsOnly="['Supervisor ', 'admin']"   class="btn btn-sm btn-warning mx-2">edit</button>
+          </td>
+         </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

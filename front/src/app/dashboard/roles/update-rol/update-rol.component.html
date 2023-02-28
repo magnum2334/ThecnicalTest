@@ -1,0 +1,37 @@
+
+<mat-dialog-content class="mat-typography">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-12">
+        <div class="card mx-5 ">
+          <div class="card-header text-center fs-2">
+            Update
+          </div>
+          <div class="card-body p-5">
+            <form [formGroup]="updateForm" (ngSubmit)="onSubmit()">
+              <div class="form-group">
+                <label>Name</label>
+                <input class="form-control" formControlName="name" placeholder="Enter Name">
+              </div>
+              <div class="form-group">  
+                <mat-form-field >
+                  <label>permissions</label>
+                  <mat-select multiple formControlName="permissions"  >
+                    <mat-option  *ngFor="let permission of permissions" [value]="permission.id">{{permission.name}}</mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="text-center">
+                <button  type="submit" class="btn btn-primary">Update</button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button  mat-dialog-close>Close</button>
+</mat-dialog-actions>

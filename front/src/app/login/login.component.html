@@ -1,0 +1,30 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6 my-5">
+      <div class="card">
+        <div class="card-header text-center fs-2">
+          Login
+        </div>
+        <div class="card-body">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" class="form-control" formControlName="email" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" class="form-control" formControlName="password" placeholder="Enter password">
+            </div>
+            <div class="text-center">
+              <button  type="submit" class="btn btn-primary">Login</button>
+            </div>
+            <div class="text-center">
+              <a routerLink="register"> register</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
